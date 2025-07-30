@@ -1,0 +1,62 @@
+# Core Data Science Libraries
+pandas==2.1.4
+numpy==1.25.2
+scipy==1.11.4
+
+# Visualization Libraries
+matplotlib==3.8.2
+seaborn==0.13.0
+plotly==5.17.0
+
+# Jupyter Notebook
+jupyter==1.0.0
+jupyterlab==4.0.9
+ipykernel==6.27.1
+
+# Machine Learning Libraries
+scikit-learn==1.3.2
+xgboost==2.0.2
+lightgbm==4.1.0
+optuna==3.4.0
+imbalanced-learn==0.11.0
+
+# MLOps and Experiment Tracking
+mlflow==2.8.1
+great-expectations
+
+# Model Monitoring and Drift Detection
+evidently==0.4.11
+
+# API Development (for deployment phase)
+fastapi==0.104.1
+uvicorn==0.24.0
+pydantic
+
+# Data Validation and Processing
+python-dotenv==1.0.0
+
+# Development and Testing Tools
+pytest==7.4.3
+pytest-cov==4.1.0
+black==23.11.0
+flake8==6.1.0
+isort==5.12.0
+mypy==1.7.1
+pre-commit==3.6.0
+
+# Utilities
+tqdm==4.66.1
+python-dateutil==2.8.2
+pytz==2023.3
+
+# Cloud and Infrastructure (for later phases)
+boto3==1.34.0
+google-cloud-storage==2.10.0
+psycopg2-binary==2.9.9
+
+# Workflow Orchestration (for later phases)
+apache-airflow==2.7.3
+
+# Additional useful libraries
+shap==0.43.0  # For model interpretability
+joblib==1.3.2  # For model serialization 
