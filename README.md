@@ -75,7 +75,37 @@ This project includes a FastAPI app (`serve.py`) and a `Dockerfile` for containe
 
 ### Deploy to Cloud
 - Push your Docker image to a registry (e.g., Docker Hub, AWS ECR, GCP Artifact Registry).
-- Deploy to AWS ECS, Google Cloud Run, Azure Container Apps, or any Kubernetes cluster.
+- I am using the AWS
+**Prerequisites:**
+- AWS CLI installed and configured (`aws configure`)
+- Docker installed and running
+
+**Step 1: Build and Push to AWS ECR**
+```bash
+# Use the automated deployment script
+chmod +x deploy_to_aws.sh
+./deploy_to_aws.sh
+
+# Or run manually:
+# 1. Build the Docker image
+docker build -t churn-model-api .
+
+# 2. Create ECR repository (replace YOUR_REGION)
+aws ecr create-repository --repository-name churn-model-api --region us-east-1
+
+# 3. Get login token and authenticate
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $(aws sts get-caller-identity --query Account --output text).dkr.ecr.us-east-1.amazonaws.com
+
+# 4. Tag and push image
+docker tag churn-model-api:latest $(aws sts get-caller-identity --query Account --output text).dkr.ecr.us-east-1.amazonaws.com/churn-model-api:latest
+docker push $(aws sts get-caller-identity --query Account --output text).dkr.ecr.us-east-1.amazonaws.com/churn-model-api:latest
+```
+
+**Step 2: Deploy to AWS Services**
+- **AWS ECS**: Create an ECS service using the ECR image URI
+- **AWS App Runner**: Deploy directly from ECR with auto-scaling
+- **AWS Lambda**: Package as container image for serverless deployment
+- **AWS EKS**: Deploy to Kubernetes cluster using the ECR image
 
 ---
 

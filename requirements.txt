@@ -2,4 +2,5 @@ pandas
 scikit-learn
 mlflow
 pytest 
-prefect 
+prefect
+awscli
