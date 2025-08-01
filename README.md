@@ -484,13 +484,15 @@ jobs:
 ### Full Deployment Pipeline
 
 ```mermaid
-graph LR
-    A[Code Push] --> B[🧪 CI Tests]
-    B --> C[🏗️ Build Docker]
-    C --> D[📦 Push to ECR] 
-    D --> E[⚡ Deploy Lambda]
-    E --> F[🧪 Test Function]
-    F --> G[✅ Ready!]
+graph TD
+    A[🧪 Run Tests] --> B[🤖 Train Model]
+    B --> C[📋 Register in Staging]
+    C --> D{🔍 Meets Criteria?}
+    D -->|Yes| E[🚀 Promote to Production]
+    D -->|No| F[❌ Stay in Staging]
+    E --> G[🏗️ Build Docker]
+    F --> G
+    G --> H[📦 Deploy to Lambda]
 ```
 
 **🎯 Zero-downtime deployments** with automatic rollback on failure!
