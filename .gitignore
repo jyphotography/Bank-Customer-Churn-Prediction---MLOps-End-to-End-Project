@@ -9,3 +9,4 @@ venv.bak/
 
 mlruns
 __pycache__
+.pytest_cache

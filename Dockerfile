@@ -1,13 +1,19 @@
-FROM python:3.11-slim
+FROM public.ecr.aws/lambda/python:3.11
 
-WORKDIR /app
+# Install system dependencies
+RUN yum update -y && yum install -y gcc g++
 
-COPY requirements.txt .
+# Copy requirements and install Python dependencies
+COPY requirements.txt ${LAMBDA_TASK_ROOT}
 RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install fastapi uvicorn
 
-COPY . .
+# Copy source code and models
+COPY src/ ${LAMBDA_TASK_ROOT}/src/
+COPY models/ ${LAMBDA_TASK_ROOT}/models/
+COPY data/ ${LAMBDA_TASK_ROOT}/data/
 
-EXPOSE 8000
+# Copy Lambda handler
+COPY src/lambda_handler.py ${LAMBDA_TASK_ROOT}
 
-CMD ["uvicorn", "src.serve:app", "--host", "0.0.0.0", "--port", "8000"] 
+# Set the CMD to your handler 
+CMD [ "lambda_handler.handler" ] 

@@ -24,6 +24,9 @@
 - [🧪 Testing](#-testing)
 - [🔄 CI/CD](#-cicd)
 - [📚 API Documentation](#-api-documentation)
+- [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
+
 ---
 
 ## 🎯 Project Overview
@@ -50,10 +53,12 @@ This project implements a **complete MLOps pipeline** that predicts the likeliho
 
 🔬 **Experiment Tracking** - MLflow for model versioning and metrics  
 🔄 **Workflow Orchestration** - Prefect for automated pipelines  
-🚀 **Model Deployment** - FastAPI + Docker for scalable serving  
-☁️ **Cloud Ready** - AWS deployment scripts and configurations  
+🚀 **Model Deployment** - FastAPI + Docker + AWS Lambda options  
+🤖 **Automated CI/CD** - GitHub Actions for seamless deployments  
+☁️ **Multi-Cloud Ready** - AWS ECR + Lambda + ECS deployment options  
 📊 **Performance Monitoring** - Real-time model performance tracking  
-🧪 **Comprehensive Testing** - Unit and integration test suites  
+🧪 **Comprehensive Testing** - Unit, integration, and Lambda testing  
+⚡ **Serverless Deployment** - Zero-maintenance AWS Lambda functions  
 
 **Data Source**: [Kaggle - Bank Customer Churn Dataset](https://www.kaggle.com/datasets/radheshyamkollipara/bank-customer-churn/data)
 
@@ -95,12 +100,16 @@ The architecture follows MLOps best practices with:
 
 ```
 📦 Bank-Customer-Churn-Prediction/
+├── 📂 .github/workflows/            # GitHub Actions CI/CD
+│   ├── 🧪 ci.yml                    # Continuous Integration workflow
+│   └── 🚀 deploy-lambda.yml         # Automated Lambda deployment
 ├── 📂 src/                          # Source code
 │   ├── 🐍 train.py                  # Model training pipeline
 │   ├── 🐍 batch.py                  # Batch prediction pipeline  
 │   ├── 🐍 serve.py                  # FastAPI serving application
 │   ├── 🐍 monitor.py                # Model monitoring utilities
 │   ├── 🐍 pipeline.py               # Prefect workflow orchestration
+│   ├── ⚡ lambda_handler.py         # AWS Lambda function handler
 │   └── 📄 __init__.py               # Package initialization
 ├── 📂 data/                         # Data storage
 │   └── 📊 Customer-Churn-Records.csv # Training dataset
@@ -108,14 +117,17 @@ The architecture follows MLOps best practices with:
 │   ├── 🤖 model.pkl                 # Trained model
 │   ├── 📋 model_columns.pkl         # Feature columns
 │   └── 📈 predictions.csv           # Batch predictions
-├── 📂 scripts/                      # Deployment scripts
-│   └── 🚀 deploy_to_aws.sh          # AWS deployment automation
+├── 📂 scripts/                      # Deployment & utility scripts
+│   ├── 🚀 deploy_to_aws.sh          # Manual AWS deployment
+│   ├── 🔧 setup-ecr.sh              # ECR repository setup
+│   └── 🧪 test-lambda-local.py      # Local Lambda testing
 ├── 📂 tests/                        # Test suites
 │   ├── 🧪 test_train.py             # Training pipeline tests
 │   └── 🧪 test_integration.py       # Integration tests
 ├── 📂 EDA/                          # Exploratory Data Analysis
 │   └── 📓 01_exploratory_data_analysis.ipynb
-├── 🐳 Dockerfile                    # Container configuration
+├── 🐳 Dockerfile                    # AWS Lambda container (Primary)
+├── 🐳 Dockerfile.fastapi            # FastAPI container (Alternative)
 ├── 📋 requirements.txt              # Python dependencies
 ├── ⚙️ Makefile                      # Build automation
 └── 📖 README.md                     # Project documentation
@@ -148,8 +160,23 @@ pip install -r requirements.txt
 
 ### 2. Run Complete Pipeline
 
+#### Option A: Automated GitHub Actions (Recommended)
 ```bash
-# Execute the full MLOps pipeline
+# Push to main branch for automatic deployment
+git add .
+git commit -m "Deploy ML model to AWS Lambda"
+git push origin main
+
+# GitHub Actions will automatically:
+# 1. Run tests and validation
+# 2. Build Docker images
+# 3. Deploy to AWS Lambda
+# 4. Test the deployed function
+```
+
+#### Option B: Local Development Pipeline
+```bash
+# Execute the full MLOps pipeline locally
 python src/pipeline.py
 ```
 
@@ -158,14 +185,16 @@ This will execute:
 2. **Batch predictions** on the dataset
 3. **Performance monitoring** and metrics calculation
 
-### 3. Alternative: Step-by-Step Execution
-
+#### Option C: Step-by-Step Execution
 ```bash
 # Individual pipeline steps
 make train     # Train the model
 make batch     # Generate batch predictions  
 make monitor   # Monitor model performance
 make test      # Run test suite
+
+# Test Lambda function locally
+python scripts/test-lambda-local.py
 ```
 
 ---
@@ -232,11 +261,11 @@ The model uses the following key features for prediction:
 ### Local Docker Deployment
 
 ```bash
-# Build Docker image
-docker build -t churn-model-api .
+# Build FastAPI Docker image
+docker build -f Dockerfile.fastapi -t churn-model-fastapi .
 
 # Run container
-docker run -p 8000:8000 churn-model-api
+docker run -p 8000:8000 churn-model-fastapi
 
 # Test the API
 curl -X POST "http://localhost:8000/predict" \
@@ -289,12 +318,82 @@ docker push $ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/churn-model-api:latest
 
 #### AWS Deployment Options
 
-| Service | Use Case | Benefits |
-|---------|----------|----------|
-| **ECS** | Container orchestration | Auto-scaling, load balancing |
-| **App Runner** | Simplified deployment | Managed scaling, easy setup |
-| **Lambda** | Serverless | Cost-effective, event-driven |
-| **EKS** | Kubernetes | Enterprise-grade orchestration |
+| Service | Use Case | Benefits | Deployment Method |
+|---------|----------|----------|-------------------|
+| **ECS** | Container orchestration | Auto-scaling, load balancing | Manual deployment script |
+| **App Runner** | Simplified deployment | Managed scaling, easy setup | Manual deployment script |
+| **Lambda** | Serverless | Cost-effective, event-driven | **🚀 Automated GitHub Actions** |
+| **EKS** | Kubernetes | Enterprise-grade orchestration | Manual deployment script |
+
+### 🤖 Automated Lambda Deployment with GitHub Actions
+
+This project includes a **fully automated deployment pipeline** that:
+
+1. **🧪 Runs tests** on every push
+2. **🏗️ Builds Docker image** optimized for Lambda
+3. **📦 Pushes to Amazon ECR** 
+4. **⚡ Deploys to AWS Lambda** automatically
+5. **🧪 Tests the deployed function**
+
+#### Quick Setup
+
+```bash
+# 1. Set up ECR repository
+./scripts/setup-ecr.sh
+
+# 2. Add GitHub Secrets in your repository settings:
+#    - AWS_ACCESS_KEY_ID
+#    - AWS_SECRET_ACCESS_KEY
+
+# 3. Push to main branch - deployment happens automatically!
+git push origin main
+```
+
+#### Lambda Function Features
+
+- **🔥 Fast cold starts** with optimized Docker images  
+- **📊 Detailed predictions** with confidence scores
+- **🛡️ Input validation** and error handling
+- **📝 Comprehensive logging** for monitoring
+- **🔄 Model caching** for improved performance
+
+#### Test Lambda Locally
+
+```bash
+# Test the Lambda function before deployment
+python scripts/test-lambda-local.py
+
+# Sample output:
+# {
+#   "prediction": 0,
+#   "prediction_label": "Will Stay", 
+#   "confidence": {
+#     "stay_probability": 0.87,
+#     "churn_probability": 0.13
+#   }
+# }
+```
+
+#### Lambda API Usage
+
+```bash
+# Invoke deployed Lambda function
+aws lambda invoke \
+  --function-name churn-model-predictor \
+  --payload '{
+    "Geography": "France",
+    "Gender": "Female", 
+    "Age": 42,
+    "CreditScore": 600,
+    "Tenure": 3,
+    "Balance": 0.0,
+    "EstimatedSalary": 50000,
+    "NumOfProducts": 1,
+    "HasCrCard": 1,
+    "IsActiveMember": 1
+  }' \
+  response.json
+```
 
 ---
 
@@ -335,63 +434,100 @@ python src/monitor.py
 make test
 
 # Run specific test categories
-pytest tests/test_train.py      # Training pipeline tests
-pytest tests/test_integration.py  # End-to-end integration tests
+pytest tests/test_train.py           # Training pipeline tests
+pytest tests/test_integration.py     # End-to-end integration tests
+
+# Test Lambda function locally
+python scripts/test-lambda-local.py  # Lambda handler testing
 ```
 
 ### Test Categories
 
-- **Unit Tests** - Individual component testing
-- **Integration Tests** - Full pipeline validation
-- **Performance Tests** - Model accuracy verification
+- **Unit Tests** - Individual component testing (`tests/test_train.py`)
+- **Integration Tests** - Full pipeline validation (`tests/test_integration.py`)
+- **Lambda Tests** - Serverless function validation (`scripts/test-lambda-local.py`)
+- **CI/CD Tests** - Automated GitHub Actions testing
+- **Docker Tests** - Container build validation
 - **API Tests** - FastAPI endpoint validation
 
 ---
 
 ## 🔄 CI/CD
 
-### GitHub Actions Integration
+### GitHub Actions Workflows
 
-The project is structured to support CI/CD pipelines:
+The project includes **two automated workflows**:
+
+#### 1. 🧪 Continuous Integration (`.github/workflows/ci.yml`)
+- **Triggers**: Every push and pull request
+- **Actions**: Tests, validation, Docker builds
+- **Purpose**: Ensure code quality and compatibility
+
+#### 2. 🚀 Lambda Deployment (`.github/workflows/deploy-lambda.yml`)
+- **Triggers**: Push to main branch
+- **Actions**: Build → ECR → Lambda deployment
+- **Purpose**: Automated production deployment
 
 ```yaml
-# .github/workflows/ci.yml (example)
-name: MLOps Pipeline
-on: [push, pull_request]
+# Simplified workflow structure
+name: 🚀 Deploy ML Model to AWS Lambda
+on:
+  push:
+    branches: [ main, master ]
+    paths: [ 'src/**', 'models/**', 'requirements.txt' ]
+
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Setup Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-      - name: Run tests
-        run: make test
-      - name: Train model
-        run: make train
+  test:          # Run comprehensive tests
+  build-deploy:  # Build Docker → Push ECR → Deploy Lambda
 ```
 
-### Deployment Pipeline
+### Full Deployment Pipeline
 
-1. **Code commit** triggers CI pipeline
-2. **Tests execute** automatically
-3. **Model trains** and validates
-4. **Docker image builds** and pushes to registry
-5. **Deployment** to staging/production environments
+```mermaid
+graph LR
+    A[Code Push] --> B[🧪 CI Tests]
+    B --> C[🏗️ Build Docker]
+    C --> D[📦 Push to ECR] 
+    D --> E[⚡ Deploy Lambda]
+    E --> F[🧪 Test Function]
+    F --> G[✅ Ready!]
+```
+
+**🎯 Zero-downtime deployments** with automatic rollback on failure!
+
+### 🔄 GitHub Actions Workflows Overview
+
+| Workflow | Trigger | Purpose | Outputs |
+|----------|---------|---------|---------|
+| **🧪 CI** | Every push/PR | Quality assurance | Test results, Docker builds |
+| **🚀 Lambda Deploy** | Push to main | Production deployment | Live Lambda function |
+
+#### Workflow Details
+
+**🧪 Continuous Integration (`.github/workflows/ci.yml`)**
+```yaml
+on: [push, pull_request]
+jobs:
+  - Install dependencies
+  - Train model  
+  - Run test suite
+  - Build Docker images (FastAPI + Lambda)
+  - Validate model artifacts
+```
+
+**🚀 Lambda Deployment (`.github/workflows/deploy-lambda.yml`)**
+```yaml
+on: 
+  push:
+    branches: [main, master]
+jobs:
+  test:        # Full CI pipeline
+  deploy:      # ECR push + Lambda deployment + testing
+```
 
 ---
 
 ## 📚 API Documentation
-
-### FastAPI Interactive Documentation
-
-Once the server is running, access:
-- **Swagger UI**: http://localhost:8000/docs
-- **ReDoc**: http://localhost:8000/redoc
 
 ### API Endpoints
 
@@ -424,15 +560,6 @@ Predict churn probability for a single customer.
 
 ---
 
-## 🤝 Contributing
-
-We welcome contributions! Please follow these steps:
-
-1. **Fork** the repository
-2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
-3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
-4. **Push** to the branch (`git push origin feature/amazing-feature`)
-5. **Open** a Pull Request
 
 ### Development Guidelines
 
@@ -451,18 +578,20 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🏆 MLOps Best Practices Implemented
 
-| Practice | Implementation |
-|----------|----------------|
-| **Experiment Tracking** | ✅ MLflow for model versioning and metrics |
-| **Model Registry** | ✅ MLflow Model Registry for production models |
-| **Workflow Orchestration** | ✅ Prefect for pipeline automation |
-| **Containerization** | ✅ Docker for consistent deployments |
-| **Cloud Deployment** | ✅ AWS-ready deployment scripts |
-| **Model Monitoring** | ✅ Performance tracking and alerting |
-| **Testing** | ✅ Comprehensive unit and integration tests |
-| **Documentation** | ✅ Detailed README and API docs |
-| **Reproducibility** | ✅ Version-controlled dependencies and configs |
-| **CI/CD Ready** | ✅ Structured for automated pipelines |
+| Practice | Implementation | Status |
+|----------|----------------|--------|
+| **Experiment Tracking** | MLflow for model versioning and metrics | ✅ Complete |
+| **Model Registry** | MLflow Model Registry for production models | ✅ Complete |
+| **Workflow Orchestration** | Prefect for pipeline automation | ✅ Complete |
+| **Containerization** | Docker for FastAPI + Lambda deployments | ✅ Complete |
+| **Cloud Deployment** | AWS ECR + Lambda + ECS ready | ✅ Complete |
+| **CI/CD Automation** | **GitHub Actions for automated deployments** | ✅ **New!** |
+| **Serverless Computing** | **AWS Lambda with container images** | ✅ **New!** |
+| **Infrastructure as Code** | **Automated ECR setup and Lambda deployment** | ✅ **New!** |
+| **Model Monitoring** | Performance tracking and alerting | ✅ Complete |
+| **Testing** | Unit, integration, and Lambda testing | ✅ Enhanced |
+| **Documentation** | Detailed README and API docs | ✅ Complete |
+| **Reproducibility** | Version-controlled dependencies and configs | ✅ Complete |
 
 ---
 
