@@ -1,7 +1,7 @@
 import pandas as pd
 
 # Load predictions
-preds = pd.read_csv('predictions.csv')
+preds = pd.read_csv('models/predictions.csv')
 
 # Calculate churn rate in predictions
 churn_rate = preds['prediction'].mean()

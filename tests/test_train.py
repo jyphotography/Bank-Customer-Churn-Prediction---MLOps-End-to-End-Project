@@ -3,10 +3,10 @@ import pickle
 import pandas as pd
 
 def test_model_training():
-    assert os.path.exists('model.pkl'), 'model.pkl not found after training.'
-    with open('model.pkl', 'rb') as f:
+    assert os.path.exists('models/model.pkl'), 'model.pkl not found after training.'
+    with open('models/model.pkl', 'rb') as f:
         model = pickle.load(f)
-    df = pd.read_csv('../Customer-Churn-Records.csv').dropna()
+    df = pd.read_csv('data/Customer-Churn-Records.csv').dropna()
     clean_features = [
         'Geography', 'Gender', 'Age',
         'CreditScore', 'Tenure', 'Balance', 'EstimatedSalary',
@@ -15,7 +15,7 @@ def test_model_training():
     X = df[clean_features]
     X_enc = pd.get_dummies(X)
     # Load model columns
-    with open('model_columns.pkl', 'rb') as f:
+    with open('models/model_columns.pkl', 'rb') as f:
         model_columns = pickle.load(f)
     for col in model_columns:
         if col not in X_enc:

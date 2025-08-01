@@ -6,7 +6,7 @@ import mlflow
 import pickle
 
 # Load data
-df = pd.read_csv('Customer-Churn-Records.csv')
+df = pd.read_csv('data/Customer-Churn-Records.csv')
 
 # Define clean features (available before churn)
 clean_features = [
@@ -52,10 +52,10 @@ with mlflow.start_run():
     print(f"Model registered: {result.name}, version: {result.version}")
 
 # Save model
-with open('model.pkl', 'wb') as f:
+with open('models/model.pkl', 'wb') as f:
     pickle.dump(model, f)
 # Save model columns for batch prediction
-with open('model_columns.pkl', 'wb') as f:
+with open('models/model_columns.pkl', 'wb') as f:
     pickle.dump(list(df_encoded.columns), f)
 
 print(f"Model trained. Accuracy: {acc:.3f}") 

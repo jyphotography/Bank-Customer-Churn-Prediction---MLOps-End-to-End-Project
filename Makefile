@@ -1,11 +1,11 @@
 train:
-	python train.py
+	python src/train.py
 
 batch:
-	python batch.py
+	python src/batch.py
 
 monitor:
-	python monitor.py
+	python src/monitor.py
 
 test:
 	pytest tests/ 

@@ -5,9 +5,9 @@ import pickle
 app = FastAPI()
 
 # Load model and columns at startup
-with open("model.pkl", "rb") as f:
+with open("models/model.pkl", "rb") as f:
     model = pickle.load(f)
-with open("model_columns.pkl", "rb") as f:
+with open("models/model_columns.pkl", "rb") as f:
     model_columns = pickle.load(f)
 
 @app.post("/predict")
